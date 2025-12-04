@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Registration & Login System</title>
+    <style>
+        :root {
+            --color-primary: #3b82f6;
+            --color-primary-hover: #2563eb;
+            --color-success: #10b981;
+            --color-error: #ef4444;
+            --color-bg: #f9fafb;
+            --color-surface: #ffffff;
+            --color-text: #1f2937;
+            --color-border: #d1d5db;
+            --color-gray: #6b7280;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--color-surface);
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--color-text);
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--color-text);
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--color-border);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            background: var(--color-surface);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+
+        input.error, select.error {
+            border-color: var(--color-error);
+        }
+
+        .error-message {
+            color: var(--color-error);
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .phone-group {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 10px;
+        }
+
+        .gender-group {
+            display: flex;
+            gap: 20px;
+        }
+
+        .gender-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .gender-option input[type="radio"] {
+            width: auto;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--color-border);
+            color: var(--color-text);
+        }
+
+        .btn-secondary:hover {
+            background: #9ca3af;
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        .password-requirements {
+            background: #f3f4f6;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 8px;
+            font-size: 12px;
+        }
+
+        .requirement {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 4px 0;
+            color: var(--color-gray);
+        }
+
+        .requirement.valid {
+            color: var(--color-success);
+        }
+
+        .requirement::before {
+            content: "✗";
+            font-weight: bold;
+        }
+
+        .requirement.valid::before {
+            content: "✓";
+        }
+
+        .details-card {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .details-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .details-row:last-child {
+            border-bottom: none;
+        }
+
+        .details-label {
+            font-weight: 600;
+            color: var(--color-gray);
+        }
+
+        .details-value {
+            color: var(--color-text);
+            text-align: right;
+        }
+
+        .switch-link {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--color-gray);
+            font-size: 14px;
+        }
+
+        .switch-link a {
+            color: var(--color-primary);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .switch-link a:hover {
+            text-decoration: underline;
+        }
+
+        .dashboard-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        .profile-image-container {
+            position: relative;
+        }
+
+        .profile-image {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--color-primary);
+        }
+
+        .upload-btn {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .upload-btn:hover {
+            background: var(--color-primary-hover);
+        }
+
+        #imageUpload {
+            display: none;
+        }
+
+        .edit-section {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .editable-field {
+            margin-bottom: 16px;
+        }
+
+        .field-label {
+            font-weight: 600;
+            color: var(--color-gray);
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .field-value {
+            color: var(--color-text);
+            font-size: 16px;
+        }
+
+        .success-message {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Registration Page -->
+        <div id="registrationPage" class="page active">
+            <h1>Create Account</h1>
+            <form id="registrationForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                    <div class="error-message" id="usernameError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="firstName">First Name</label>
+                    <input type="text" id="firstName" name="firstName" required>
+                    <div class="error-message" id="firstNameError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="lastName">Last Name</label>
+                    <input type="text" id="lastName" name="lastName" required>
+                    <div class="error-message" id="lastNameError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                    <div class="error-message" id="emailError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="mobile">Mobile Number</label>
+                    <div class="phone-group">
+                        <select id="countryCode" name="countryCode">
+                            <option value="+91">🇮🇳 +91</option>
+                            <option value="+1">🇺🇸 +1</option>
+                            <option value="+44">🇬🇧 +44</option>
+                            <option value="+86">🇨🇳 +86</option>
+                            <option value="+81">🇯🇵 +81</option>
+                            <option value="+49">🇩🇪 +49</option>
+                            <option value="+33">🇫🇷 +33</option>
+                            <option value="+61">🇦🇺 +61</option>
+                            <option value="+971">🇦🇪 +971</option>
+                            <option value="+65">🇸🇬 +65</option>
+                        </select>
+                        <input type="tel" id="mobile" name="mobile" maxlength="10" required>
+                    </div>
+                    <div class="error-message" id="mobileError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Gender</label>
+                    <div class="gender-group">
+                        <div class="gender-option">
+                            <input type="radio" id="male" name="gender" value="Male" required>
+                            <label for="male" style="margin: 0;">Male</label>
+                        </div>
+                        <div class="gender-option">
+                            <input type="radio" id="female" name="gender" value="Female">
+                            <label for="female" style="margin: 0;">Female</label>
+                        </div>
+                        <div class="gender-option">
+                            <input type="radio" id="other" name="gender" value="Other">
+                            <label for="other" style="margin: 0;">Other</label>
+                        </div>
+                    </div>
+                    <div class="error-message" id="genderError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="dob">Date of Birth</label>
+                    <input type="date" id="dob" name="dob" required>
+                    <div class="error-message" id="dobError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                    <div class="password-requirements">
+                        <div class="requirement" id="reqLength">At least 8 characters</div>
+                        <div class="requirement" id="reqUpper">One uppercase letter</div>
+                        <div class="requirement" id="reqLower">One lowercase letter</div>
+                        <div class="requirement" id="reqNumber">One number</div>
+                        <div class="requirement" id="reqSpecial">One special character</div>
+                        <div class="requirement" id="reqNoName">Does not contain username</div>
+                    </div>
+                    <div class="error-message" id="passwordError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                    <div class="error-message" id="confirmPasswordError"></div>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn-secondary" id="resetBtn">Reset</button>
+                    <button type="submit" class="btn-primary">Submit</button>
+                </div>
+
+                <div class="switch-link">
+                    Already have an account? <a id="showLogin">Login</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Details Preview Page -->
+        <div id="detailsPage" class="page">
+            <h1>Review Your Details</h1>
+            <div class="details-card" id="detailsCard"></div>
+            <div class="button-group">
+                <button class="btn-secondary" id="backToForm">Back</button>
+                <button class="btn-primary" id="confirmSubmit">Confirm</button>
+            </div>
+        </div>
+
+        <!-- Login Page -->
+        <div id="loginPage" class="page">
+            <h1>Welcome Back</h1>
+            <div class="success-message" id="loginSuccess"></div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginIdentifier">Email or Phone Number</label>
+                    <input type="text" id="loginIdentifier" name="loginIdentifier" required>
+                    <div class="error-message" id="loginIdentifierError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" name="loginPassword" required>
+                    <div class="error-message" id="loginPasswordError"></div>
+                </div>
+
+                <div class="switch-link" style="margin-bottom: 20px; margin-top: 0;">
+                    <a id="showResetPassword">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="btn-primary btn-full">Login</button>
+
+                <div class="switch-link">
+                    Don't have an account? <a id="showRegister">Register</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Reset Password Page -->
+        <div id="resetPasswordPage" class="page">
+            <h1>Reset Password</h1>
+            <div class="success-message" id="resetSuccess"></div>
+            <form id="resetPasswordForm">
+                <div class="form-group">
+                    <label for="resetEmail">Email</label>
+                    <input type="email" id="resetEmail" name="resetEmail" required>
+                    <div class="error-message" id="resetEmailError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="newPassword">New Password</label>
+                    <input type="password" id="newPassword" name="newPassword" required>
+                    <div class="password-requirements">
+                        <div class="requirement" id="resetReqLength">At least 8 characters</div>
+                        <div class="requirement" id="resetReqUpper">One uppercase letter</div>
+                        <div class="requirement" id="resetReqLower">One lowercase letter</div>
+                        <div class="requirement" id="resetReqNumber">One number</div>
+                        <div class="requirement" id="resetReqSpecial">One special character</div>
+                    </div>
+                    <div class="error-message" id="newPasswordError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmNewPassword">Confirm New Password</label>
+                    <input type="password" id="confirmNewPassword" name="confirmNewPassword" required>
+                    <div class="error-message" id="confirmNewPasswordError"></div>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn-secondary" id="backToLogin">Cancel</button>
+                    <button type="submit" class="btn-primary">Reset Password</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Dashboard Page -->
+        <div id="dashboardPage" class="page">
+            <h1>Dashboard</h1>
+            <div class="dashboard-header">
+                <div class="profile-image-container">
+                    <img id="profileImage" class="profile-image" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23667eea'/%3E%3Ctext x='50' y='50' text-anchor='middle' dy='0.35em' fill='white' font-size='40' font-family='Arial'%3EU%3C/text%3E%3C/svg%3E" alt="Profile">
+                    <button class="upload-btn" id="uploadImageBtn">+</button>
+                    <input type="file" id="imageUpload" accept="image/*">
+                </div>
+                <div>
+                    <h2 id="dashboardName" style="margin-bottom: 8px;"></h2>
+                    <p id="dashboardEmail" style="color: var(--color-gray);"></p>
+                </div>
+            </div>
+
+            <div class="edit-section">
+                <h3 style="margin-bottom: 20px;">Personal Information</h3>
+                
+                <div class="editable-field">
+                    <div class="field-label">Username (Cannot be changed)</div>
+                    <div class="field-value" id="dashUsername"></div>
+                </div>
+
+                <div class="editable-field">
+                    <div class="field-label">First Name (Cannot be changed)</div>
+                    <div class="field-value" id="dashFirstName"></div>
+                </div>
+
+                <div class="editable-field">
+                    <div class="field-label">Last Name (Cannot be changed)</div>
+                    <div class="field-value" id="dashLastName"></div>
+                </div>
+
+                <div class="editable-field">
+                    <div class="field-label">Email</div>
+                    <input type="email" id="dashEditEmail" class="field-value" style="border: 1px solid var(--color-border); border-radius: 6px; padding: 8px;">
+                </div>
+
+                <div class="editable-field">
+                    <div class="field-label">Mobile Number</div>
+                    <div style="display: grid; grid-template-columns: 120px 1fr; gap: 10px;">
+                        <select id="dashEditCountryCode" style="border: 1px solid var(--color-border); border-radius: 6px; padding: 8px;">
+                            <option value="+91">🇮🇳 +91</option>
+                            <option value="+1">🇺🇸 +1</option>
+                            <option value="+44">🇬🇧 +44</option>
+                            <option value="+86">🇨🇳 +86</option>
+                            <option value="+81">🇯🇵 +81</option>
+                            <option value="+49">🇩🇪 +49</option>
+                            <option value="+33">🇫🇷 +33</option>
+                            <option value="+61">🇦🇺 +61</option>
+                            <option value="+971">🇦🇪 +971</option>
+                            <option value="+65">🇸🇬 +65</option>
+                        </select>
+                        <input type="tel" id="dashEditMobile" class="field-value" maxlength="10" style="border: 1px solid var(--color-border); border-radius: 6px; padding: 8px;">
+                    </div>
+                </div>
+
+                <div class="editable-field">
+                    <div class="field-label">Gender</div>
+                    <div class="field-value" id="dashGender"></div>
+                </div>
+
+                <div class="editable-field">
+                    <div class="field-label">Date of Birth</div>
+                    <div class="field-value" id="dashDob"></div>
+                </div>
+
+                <div class="form-group" style="margin-top: 24px;">
+                    <label for="dashNewPassword">Change Password</label>
+                    <input type="password" id="dashNewPassword" placeholder="Leave empty to keep current password">
+                    <div class="password-requirements">
+                        <div class="requirement" id="dashReqLength">At least 8 characters</div>
+                        <div class="requirement" id="dashReqUpper">One uppercase letter</div>
+                        <div class="requirement" id="dashReqLower">One lowercase letter</div>
+                        <div class="requirement" id="dashReqNumber">One number</div>
+                        <div class="requirement" id="dashReqSpecial">One special character</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="dashConfirmPassword">Confirm New Password</label>
+                    <input type="password" id="dashConfirmPassword" placeholder="Confirm new password">
+                </div>
+            </div>
+
+            <div class="success-message" id="updateSuccess"></div>
+
+            <div class="button-group" style="margin-top: 30px;">
+                <button class="btn-secondary" id="logoutBtn">Logout</button>
+                <button class="btn-primary" id="saveChangesBtn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Utility Functions
+        function generateUserId() {
+            return 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = message;
+            errorElement.classList.add('show');
+            document.getElementById(elementId.replace('Error', '')).classList.add('error');
+        }
+
+        function clearError(elementId) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.classList.remove('show');
+            document.getElementById(elementId.replace('Error', '')).classList.remove('error');
+        }
+
+        function clearAllErrors() {
+            document.querySelectorAll('.error-message').forEach(el => el.classList.remove('show'));
+            document.querySelectorAll('input, select').forEach(el => el.classList.remove('error'));
+        }
+
+        function capitalizeFirstLetter(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        // Validation Functions
+        function validateEmail(email) {
+            return email.includes('@') && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        function validateMobile(mobile) {
+            return /^\d{10}$/.test(mobile);
+        }
+
+        function validatePassword(password, username = '') {
+            const checks = {
+                length: password.length >= 8,
+                upper: /[A-Z]/.test(password),
+                lower: /[a-z]/.test(password),
+                number: /\d/.test(password),
+                special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+                noName: !username || !password.toLowerCase().includes(username.toLowerCase())
+            };
+            return checks;
+        }
+
+        function updatePasswordRequirements(passwordValue, username = '', prefix = '') {
+            const checks = validatePassword(passwordValue, username);
+            document.getElementById(prefix + 'reqLength').classList.toggle('valid', checks.length);
+            document.getElementById(prefix + 'reqUpper').classList.toggle('valid', checks.upper);
+            document.getElementById(prefix + 'reqLower').classList.toggle('valid', checks.lower);
+            document.getElementById(prefix + 'reqNumber').classList.toggle('valid', checks.number);
+            document.getElementById(prefix + 'reqSpecial').classList.toggle('valid', checks.special);
+            if (document.getElementById(prefix + 'reqNoName')) {
+                document.getElementById(prefix + 'reqNoName').classList.toggle('valid', checks.noName);
+            }
+            return Object.values(checks).every(v => v);
+        }
+
+        // Set max date for DOB (today)
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('dob').setAttribute('max', today);
+
+        // Registration Form Handling
+        const registrationForm = document.getElementById('registrationForm');
+        let formData = {};
+
+        // Username validation - capitalize first letter
+        document.getElementById('username').addEventListener('input', (e) => {
+            if (e.target.value.length > 0) {
+                e.target.value = capitalizeFirstLetter(e.target.value);
+            }
+            clearError('usernameError');
+        });
+
+        // First and Last name - capitalize first letter
+        document.getElementById('firstName').addEventListener('input', (e) => {
+            if (e.target.value.length > 0) {
+                e.target.value = capitalizeFirstLetter(e.target.value);
+            }
+            clearError('firstNameError');
+        });
+
+        document.getElementById('lastName').addEventListener('input', (e) => {
+            if (e.target.value.length > 0) {
+                e.target.value = capitalizeFirstLetter(e.target.value);
+            }
+            clearError('lastNameError');
+        });
+
+        // Email validation
+        document.getElementById('email').addEventListener('blur', (e) => {
+            clearError('emailError');
+            if (e.target.value && !validateEmail(e.target.value)) {
+                showError('emailError', 'Email must contain @ and be valid');
+            }
+        });
+
+        // Mobile validation - only numbers, max 10
+        document.getElementById('mobile').addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10);
+            clearError('mobileError');
+        });
+
+        document.getElementById('mobile').addEventListener('blur', (e) => {
+            if (e.target.value && !validateMobile(e.target.value)) {
+                showError('mobileError', 'Mobile number must be exactly 10 digits');
+            }
+        });
+
+        // Password validation
+        document.getElementById('password').addEventListener('input', (e) => {
+            const username = document.getElementById('username').value;
+            updatePasswordRequirements(e.target.value, username);
+            clearError('passwordError');
+        });
+
+        document.getElementById('confirmPassword').addEventListener('input', () => {
+            clearError('confirmPasswordError');
+        });
+
+        // Reset button
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            registrationForm.reset();
+            clearAllErrors();
+            document.querySelectorAll('.requirement').forEach(req => req.classList.remove('valid'));
+        });
+
+        // Registration form submission
+        registrationForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            clearAllErrors();
+            
+            let isValid = true;
+
+            // Get form values
+            const username = document.getElementById('username').value;
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const email = document.getElementById('email').value;
+            const countryCode = document.getElementById('countryCode').value;
+            const mobile = document.getElementById('mobile').value;
+            const gender = document.querySelector('input[name="gender"]:checked')?.value;
+            const dob = document.getElementById('dob').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // Validate all fields
+            if (!username) {
+                showError('usernameError', 'Username is required');
+                isValid = false;
+            }
+
+            if (!firstName) {
+                showError('firstNameError', 'First name is required');
+                isValid = false;
+            }
+
+            if (!lastName) {
+                showError('lastNameError', 'Last name is required');
+                isValid = false;
+            }
+
+            if (!email || !validateEmail(email)) {
+                showError('emailError', 'Valid email with @ is required');
+                isValid = false;
+            }
+
+            if (!mobile || !validateMobile(mobile)) {
+                showError('mobileError', 'Mobile number must be exactly 10 digits');
+                isValid = false;
+            }
+
+            if (!gender) {
+                showError('genderError', 'Please select a gender');
+                isValid = false;
+            }
+
+            if (!dob) {
+                showError('dobError', 'Date of birth is required');
+                isValid = false;
+            }
+
+            const passwordChecks = validatePassword(password, username);
+            if (!Object.values(passwordChecks).every(v => v)) {
+                showError('passwordError', 'Password does not meet all requirements');
+                isValid = false;
+            }
+
+            if (password !== confirmPassword) {
+                showError('confirmPasswordError', 'Passwords do not match');
+                isValid = false;
+            }
+
+            if (isValid) {
+                // Store form data
+                formData = {
+                    username,
+                    firstName,
+                    lastName,
+                    email,
+                    countryCode,
+                    mobile,
+                    gender,
+                    dob,
+                    password
+                };
+
+                // Show details preview
+                displayDetails();
+                showPage('detailsPage');
+            }
+        });
+
+        // Display details for review
+        function displayDetails() {
+            const detailsHTML = `
+                <div class="details-row">
+                    <span class="details-label">Username:</span>
+                    <span class="details-value">${formData.username}</span>
+                </div>
+                <div class="details-row">
+                    <span class="details-label">First Name:</span>
+                    <span class="details-value">${formData.firstName}</span>
+                </div>
+                <div class="details-row">
+                    <span class="details-label">Last Name:</span>
+                    <span class="details-value">${formData.lastName}</span>
+                </div>
+                <div class="details-row">
+                    <span class="details-label">Email:</span>
+                    <span class="details-value">${formData.email}</span>
+                </div>
+                <div class="details-row">
+                    <span class="details-label">Mobile:</span>
+                    <span class="details-value">${formData.countryCode} ${formData.mobile}</span>
+                </div>
+                <div class="details-row">
+                    <span class="details-label">Gender:</span>
+                    <span class="details-value">${formData.gender}</span>
+                </div>
+                <div class="details-row">
+                    <span class="details-label">Date of Birth:</span>
+                    <span class="details-value">${new Date(formData.dob).toLocaleDateString()}</span>
+                </div>
+            `;
+            document.getElementById('detailsCard').innerHTML = detailsHTML;
+        }
+
+        // Back to form button
+        document.getElementById('backToForm').addEventListener('click', () => {
+            showPage('registrationPage');
+        });
+
+        // Confirm submission
+        document.getElementById('confirmSubmit').addEventListener('click', () => {
+            // Generate unique user ID
+            const userId = generateUserId();
+            
+            // Store in session storage
+            const userData = {
+                userId,
+                ...formData,
+                registrationDate: new Date().toISOString(),
+                profileImage: null
+            };
+
+            sessionStorage.setItem('currentUser', JSON.stringify(userData));
+            sessionStorage.setItem('userDatabase', JSON.stringify([userData]));
+
+            // Show success and redirect to login
+            document.getElementById('loginSuccess').textContent = 'Registration successful! Please login.';
+            document.getElementById('loginSuccess').classList.add('show');
+            
+            setTimeout(() => {
+                document.getElementById('loginSuccess').classList.remove('show');
+            }, 3000);
+
+            registrationForm.reset();
+            formData = {};
+            showPage('loginPage');
+        });
+
+        // Login Form Handling
+        const loginForm = document.getElementById('loginForm');
+        
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            clearAllErrors();
+
+            const identifier = document.getElementById('loginIdentifier').value;
+            const password = document.getElementById('loginPassword').value;
+
+            // Get user database
+            const database = JSON.parse(sessionStorage.getItem('userDatabase') || '[]');
+
+            // Find user by email or phone
+            const user = database.find(u => 
+                u.email === identifier || 
+                (u.countryCode + u.mobile) === identifier.replace(/\s/g, '')
+            );
+
+            if (!user) {
+                showError('loginIdentifierError', 'User not found');
+                return;
+            }
+
+            if (user.password !== password) {
+                showError('loginPasswordError', 'Incorrect password');
+                return;
+            }
+
+            // Login successful
+            sessionStorage.setItem('currentUser', JSON.stringify(user));
+            loadDashboard();
+            showPage('dashboardPage');
+        });
+
+        // Reset Password Handling
+        document.getElementById('newPassword').addEventListener('input', (e) => {
+            updatePasswordRequirements(e.target.value, '', 'reset');
+        });
+
+        document.getElementById('resetPasswordForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            clearAllErrors();
+
+            const email = document.getElementById('resetEmail').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+
+            const database = JSON.parse(sessionStorage.getItem('userDatabase') || '[]');
+            const userIndex = database.findIndex(u => u.email === email);
+
+            if (userIndex === -1) {
+                showError('resetEmailError', 'Email not found in our database');
+                return;
+            }
+
+            const passwordChecks = validatePassword(newPassword);
+            if (!Object.values(passwordChecks).every(v => v)) {
+                showError('newPasswordError', 'Password does not meet all requirements');
+                return;
+            }
+
+            if (newPassword !== confirmNewPassword) {
+                showError('confirmNewPasswordError', 'Passwords do not match');
+                return;
+            }
+
+            // Update password
+            database[userIndex].password = newPassword;
+            sessionStorage.setItem('userDatabase', JSON.stringify(database));
+
+            document.getElementById('resetSuccess').textContent = 'Password reset successful! Redirecting to login...';
+            document.getElementById('resetSuccess').classList.add('show');
+
+            setTimeout(() => {
+                document.getElementById('resetPasswordForm').reset();
+                document.getElementById('resetSuccess').classList.remove('show');
+                showPage('loginPage');
+            }, 2000);
+        });
+
+        // Dashboard Functions
+        function loadDashboard() {
+            const user = JSON.parse(sessionStorage.getItem('currentUser'));
+            
+            document.getElementById('dashboardName').textContent = `${user.firstName} ${user.lastName}`;
+            document.getElementById('dashboardEmail').textContent = user.email;
+            document.getElementById('dashUsername').textContent = user.username;
+            document.getElementById('dashFirstName').textContent = user.firstName;
+            document.getElementById('dashLastName').textContent = user.lastName;
+            document.getElementById('dashEditEmail').value = user.email;
+            document.getElementById('dashEditCountryCode').value = user.countryCode;
+            document.getElementById('dashEditMobile').value = user.mobile;
+            document.getElementById('dashGender').textContent = user.gender;
+            document.getElementById('dashDob').textContent = new Date(user.dob).toLocaleDateString();
+
+            // Load profile image
+            if (user.profileImage) {
+                document.getElementById('profileImage').src = user.profileImage;
+            } else {
+                const initial = user.firstName.charAt(0).toUpperCase();
+                document.getElementById('profileImage').src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23667eea'/%3E%3Ctext x='50' y='50' text-anchor='middle' dy='0.35em' fill='white' font-size='40' font-family='Arial'%3E${initial}%3C/text%3E%3C/svg%3E`;
+            }
+        }
+
+        // Image upload
+        document.getElementById('uploadImageBtn').addEventListener('click', () => {
+            document.getElementById('imageUpload').click();
+        });
+
+        document.getElementById('imageUpload').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const imageData = event.target.result;
+                    document.getElementById('profileImage').src = imageData;
+                    
+                    // Update session
+                    const user = JSON.parse(sessionStorage.getItem('currentUser'));
+                    user.profileImage = imageData;
+                    sessionStorage.setItem('currentUser', JSON.stringify(user));
+                    
+                    // Update database
+                    const database = JSON.parse(sessionStorage.getItem('userDatabase'));
+                    const userIndex = database.findIndex(u => u.userId === user.userId);
+                    if (userIndex !== -1) {
+                        database[userIndex].profileImage = imageData;
+                        sessionStorage.setItem('userDatabase', JSON.stringify(database));
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Dashboard password validation
+        document.getElementById('dashNewPassword').addEventListener('input', (e) => {
+            updatePasswordRequirements(e.target.value, '', 'dash');
+        });
+
+        // Save changes
+        document.getElementById('saveChangesBtn').addEventListener('click', () => {
+            const user = JSON.parse(sessionStorage.getItem('currentUser'));
+            const newEmail = document.getElementById('dashEditEmail').value;
+            const newCountryCode = document.getElementById('dashEditCountryCode').value;
+            const newMobile = document.getElementById('dashEditMobile').value;
+            const newPassword = document.getElementById('dashNewPassword').value;
+            const confirmPassword = document.getElementById('dashConfirmPassword').value;
+
+            // Validate email
+            if (!validateEmail(newEmail)) {
+                alert('Please enter a valid email address');
+                return;
+            }
+
+            // Validate mobile
+            if (!validateMobile(newMobile)) {
+                alert('Mobile number must be exactly 10 digits');
+                return;
+            }
+
+            // Validate password if changed
+            if (newPassword) {
+                const passwordChecks = validatePassword(newPassword);
+                if (!Object.values(passwordChecks).every(v => v)) {
+                    alert('New password does not meet all requirements');
+                    return;
+                }
+
+                if (newPassword !== confirmPassword) {
+                    alert('Passwords do not match');
+                    return;
+                }
+                
+                user.password = newPassword;
+            }
+
+            // Update user data
+            user.email = newEmail;
+            user.countryCode = newCountryCode;
+            user.mobile = newMobile;
+
+            // Update session
+            sessionStorage.setItem('currentUser', JSON.stringify(user));
+
+            // Update database
+            const database = JSON.parse(sessionStorage.getItem('userDatabase'));
+            const userIndex = database.findIndex(u => u.userId === user.userId);
+            if (userIndex !== -1) {
+                database[userIndex] = user;
+                sessionStorage.setItem('userDatabase', JSON.stringify(database));
+            }
+
+            // Show success message
+            document.getElementById('updateSuccess').textContent = 'Changes saved successfully!';
+            document.getElementById('updateSuccess').classList.add('show');
+
+            // Clear password fields
+            document.getElementById('dashNewPassword').value = '';
+            document.getElementById('dashConfirmPassword').value = '';
+
+            setTimeout(() => {
+                document.getElementById('updateSuccess').classList.remove('show');
+            }, 3000);
+
+            // Reload dashboard
+            loadDashboard();
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            if (confirm('Are you sure you want to logout?')) {
+                showPage('loginPage');
+            }
+        });
+
+        // Navigation between pages
+        document.getElementById('showLogin').addEventListener('click', () => showPage('loginPage'));
+        document.getElementById('showRegister').addEventListener('click', () => showPage('registrationPage'));
+        document.getElementById('showResetPassword').addEventListener('click', () => showPage('resetPasswordPage'));
+        document.getElementById('backToLogin').addEventListener('click', () => showPage('loginPage'));
+
+        // Check if user is already logged in
+        window.addEventListener('load', () => {
+            const currentUser = sessionStorage.getItem('currentUser');
+            if (currentUser) {
+                const user = JSON.parse(currentUser);
+                // Check if this is a fresh registration (no login yet)
+                if (user.password) {
+                    // User exists, could show dashboard or login
+                    // For now, we'll default to login page
+                    showPage('loginPage');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+
